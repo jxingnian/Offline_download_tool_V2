@@ -262,6 +262,7 @@ static uint32_t DAP_Connect(const uint8_t *request, uint8_t *response) {
 //   return:   number of bytes in response
 static uint32_t DAP_Disconnect(uint8_t *response) {
 
+
   DAP_Data.debug_port = DAP_PORT_DISABLED;
   PORT_OFF();
 
@@ -288,7 +289,20 @@ static uint32_t DAP_ResetTarget(uint8_t *response) {
     }
   }
 #endif
-
+  // 如果是SWD模式,执行系统复位
+  if (DAP_Data.debug_port == DAP_PORT_SWD) {
+    uint8_t ack;
+    uint32_t AIRCR_REG_ADDR = 0xE000ED0C;
+    uint32_t AIRCR_RESET_VAL = 0x05FA0004;  // 系统复位值
+    uint8_t req = DAP_TRANSFER_APnDP | 0 | DAP_TRANSFER_A2 | 0;
+    ack = SWD_Transfer(req, &AIRCR_REG_ADDR);
+    if (ack == DAP_TRANSFER_OK) {
+      Delayms(2);
+      req = DAP_TRANSFER_APnDP | 0 | DAP_TRANSFER_A2 | DAP_TRANSFER_A3;
+      SWD_Transfer(req, &AIRCR_RESET_VAL);
+      Delayms(100);  // 等待复位完成
+    }
+  }
   *(response+1) = RESET_TARGET();
   *(response+0) = DAP_OK;
   return (2U);
@@ -1699,11 +1713,10 @@ uint32_t DAP_ProcessCommand(const uint8_t *request, uint8_t *response) {
       num = DAP_Connect(request, response);
       break;
     case ID_DAP_Disconnect:
-      if(DAP_Data.debug_port == DAP_PORT_SWD)  /* +++lakun:SWD模式下需要软启动，JTAG模式下不需要 */
-      {
-        swd_init_debug();                    /* +++lakun:使目标MCU进入调试模式 */
-        swd_set_target_reset(0);             /* +++lakun:写入命令实现软复位启动 */
-      }
+      // if(DAP_Data.debug_port == DAP_PORT_SWD)  
+      // {
+      //   swd_write_word(0xE000ED0C, 0x05FA0004);  // 写入AIRCR寄存器进行系统复位
+      // }
       num = DAP_Disconnect(response);
       break;
 

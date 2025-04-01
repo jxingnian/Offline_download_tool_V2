@@ -1,3 +1,11 @@
+/*
+ * @Author: xingnian j_xingnian@163.com
+ * @Date: 2025-03-31 17:02:53
+ * @LastEditors: xingnian j_xingnian@163.com
+ * @LastEditTime: 2025-03-31 17:39:16
+ * @FilePath: \Offline_download_tool_V2\components\DAP\Include\swd_host.h
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 #ifndef SWDHOST_CM_H
 #define SWDHOST_CM_H
 
@@ -41,7 +49,7 @@ uint8_t swd_flash_syscall_exec(const program_syscall_t *sysCallParam, uint32_t e
 void swd_set_target_reset(uint8_t asserted);
 uint8_t swd_set_target_state_hw(target_state_t state);
 uint8_t swd_set_target_state_sw(target_state_t state);
-
+uint8_t swd_write_word(uint32_t addr, uint32_t val);
 #ifdef __cplusplus
 }
 #endif

@@ -390,6 +390,7 @@ __STATIC_FORCEINLINE uint32_t PIN_nRESET_IN(void)
            - 0: 发出设备硬件复位。
            - 1: 释放设备硬件复位。
 */
+
 __STATIC_FORCEINLINE void     PIN_nRESET_OUT(uint32_t bit)
 {
 	if (bit)
